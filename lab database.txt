@@ -1,0 +1,29 @@
+Zoran Sarajlic
+3:46 PM
+DECLARE
+lv_total_num NUMBER(6,2) := 50;
+BEGIN
+IF lv_total_num > 200 THEN
+DBMS_OUTPUT.PUT_LINE('HIGH');
+ELSIF lv_total_num >100 THEN
+DBMS_OUTPUT.PUT_LINE('mid');
+ELSE
+DBMS_OUTPUT.PUT_LINE('LOW');
+END IF;
+END;
+
+
+2.
+DECLARE
+lv_bal_num NUMBER(6,2) := 150.00;
+lv_pay_num NUMBER(8,2) := 195.00;
+lv_due_bln BOOLEAN;
+BEGIN
+IF (lv_bal_num - lv_pay_num) > 0 THEN
+lv_due_bln := TRuE;
+DBMS_OUTPUT.PUT_LINE('due balance');
+ELSE
+lv_due_bln := FALSE;
+DBMS_OUTPUT.PUT_LINE('paid in full');
+END IF;
+END;

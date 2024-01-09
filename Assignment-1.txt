@@ -1,0 +1,50 @@
+/*Assignment-1*/
+/*Najmun Nahar*/
+
+/* 1.List the name of each officer who has reported more than the average number of crimes officers have reported*/
+
+SELECT a.first||' '||a.last name
+FROM officers a,(SELECT officer_id,COUNT(crime_id)crimereported FROM crime_officers GROUP BY officer_id)b
+WHERE a.officer_id=b.officer_id
+AND b.crimereported>(SELECT AVG(COUNT(*)) FROM crime_officers GROUP BY officer_id);
+
+/*2. List the names of all criminals who have committed less than average number of crimes and aren’t listed as violent offenders*/
+
+SELECT a.first||' '||a.last name
+FROM criminals a JOIN (SELECT criminal_id,COUNT(crime_id)"crimes committed" FROM crimes GROUP BY criminal_id)b
+ON a.criminal_id=b.criminal_id
+WHERE b."crimes committed"<(SELECT AVG(COUNT(*)) FROM crimes GROUP BY criminal_id)
+AND a.v_status='N';
+
+/*3. List appeal information for each appeal that has a less than average number of days between the filing and hearing dates*/
+
+SELECT * FROM appeals 
+WHERE (hearing_date-filing_date)<(SELECT AVG(hearing_date-filing_date) FROM appeals);
+
+/*4. List the names of probation officers who have had a less than average number of criminals assigned*/
+
+SELECT a.first||' '||a.last name
+FROM prob_officers a,(SELECT prob_id,COUNT(DISTINCT(criminal_id))criminals FROM sentences GROUP BY prob_id)b
+WHERE a.prob_id=b.prob_id
+AND b.criminals<(SELECT AVG(COUNT(DISTINCT(criminal_id))) FROM sentences GROUP BY prob_id);
+
+/*5. List each crime that has had the highest number of appeals recorded*/
+
+SELECT a.crime_id,a.criminal_id,a.status,a.date_recorded
+FROM crimes a,(SELECT crime_id,COUNT(appeal_id)appealcount FROM appeals GROUP BY crime_id)b
+WHERE a.crime_id=b.crime_id
+AND b.appealcount>=(SELECT MAX(COUNT(appeal_id)) FROM appeals GROUP BY crime_id) ;
+
+/*6. List the information on crime charges for each charge that has had a fine above average and a sum paid below average.*/
+
+SELECT * FROM crime_charges
+WHERE fine_amount>(SELECT AVG(fine_amount) FROM crime_charges)
+AND amount_paid<(SELECT AVG(amount_paid) FROM crime_charges);
+
+/*7. List the names of all criminals who have had any of the crime code charges involved in crime ID 10089*/
+
+SELECT DISTINCT a.first||' '||a.last name FROM criminals a,(SELECT crime_id,criminal_id,crime_code FROM crimes JOIN crime_charges using(crime_id))b
+WHERE a.criminal_id=b.criminal_id
+AND b.crime_code =(SELECT crime_code FROM crime_charges WHERE crime_id = 10089);
+
+

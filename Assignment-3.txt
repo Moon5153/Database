@@ -1,0 +1,123 @@
+/*-------QUESTION NO:1--------*/
+
+CREATE OR REPLACE PROCEDURE MEMBER_CK_SP(p_userId IN bb_shopper.username%TYPE, p_userpassword IN bb_shopper.password%TYPE,p_check OUT VARCHAR2)
+AS
+check_text VARCHAR2(30):='INVALID';
+CURSOR MEMBER_CURSOR IS
+    SELECT firstname,lastname,cookie FROM bb_shopper WHERE username=p_userId
+    AND p_userpassword= password;
+    BEGIN
+        p_check:=check_text;
+        FOR P_MEMBER_CURSOR IN MEMBER_CURSOR LOOP
+        p_check:='Full Name: '||P_MEMBER_CURSOR.firstname||' '||P_MEMBER_CURSOR.lastname||' Cookie Value: '||P_MEMBER_CURSOR.cookie;
+        DBMS_OUTPUT.PUT_LINE(p_check);
+        END LOOP;
+    IF p_check=check_text THEN
+    DBMS_OUTPUT.PUT_LINE('INVALID');
+    END IF;
+END MEMBER_CK_SP;
+
+/----Test Block---/
+DECLARE
+ p_checktext VARCHAR2(150);
+BEGIN
+ MEMBER_CK_SP('rat55','kile',p_checktext);
+ MEMBER_CK_SP('rat','kile',p_checktext);
+END;
+
+/*----QUESTION NO-2------*/
+
+CREATE OR REPLACE PROCEDURE DDPAY_SP( dd_iddonor dd_pledge.iddonor%TYPE, dd_status OUT BOOLEAN)
+AS
+pl_count NUMBER;
+BEGIN
+    SELECT COUNT(iddonor) INTO pl_count FROM dd_pledge 
+    WHERE dd_iddonor=iddonor AND paymonths=0 
+    AND idstatus!=10;
+        IF pl_count>0 THEN
+            dd_status:=TRUE;
+        ELSE
+            dd_status:=FALSE;
+        END IF;
+END DDPAY_SP;
+
+/*----TEST-BLOCK----*/
+DECLARE
+    pl_iddonor dd_pledge.iddonor%TYPE:=301;
+    pl_status BOOLEAN;
+BEGIN
+    DDPAY_SP(pl_iddonor,pl_status);
+    CASE WHEN pl_status 
+    THEN
+        DBMS_OUTPUT.PUT_LINE('Donor '||pl_iddonor||' has completed pledges');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Donor '||pl_iddonor||' has no completed pledge');
+    END CASE;
+END;
+
+
+/*-----QUESTION NO:3------*/
+CREATE OR REPLACE PROCEDURE DDCKPAY_SP(pl_payamount IN dd_pledge.pledgeamt%TYPE, pl_id IN dd_pledge.idpledge%TYPE)
+AS
+correct_payment NUMBER;
+BEGIN
+    SELECT pledgeamt/paymonths INTO correct_payment FROM dd_pledge WHERE pl_id=idpledge 
+    AND paymonths!=0;
+    IF pl_payamount=correct_payment THEN
+        DBMS_OUTPUT.PUT_LINE('Correct Payment Amount');
+    ELSE
+        RAISE_APPLICATION_ERROR(-20050,'Incorrect Payment amount - planned payment = '||correct_payment);
+    END IF;  
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('No Payment Information');
+END DDCKPAY_SP;
+
+/*----Test----*/
+ACCEPT in_amount NUMBER PROMPT 'Enter the payment amount';
+ACCEPT in_id NUMBER PROMPT 'Enter the pledge ID';
+DECLARE
+ p_amount NUMBER:=&in_amount;
+ p_id NUMBER:=&in_id;
+BEGIN 
+    DDCKPAY_SP(p_amount,p_id);   
+END;
+
+/*--------------------------QUESTION NO:4--------------------*/
+
+/*---------------PROCEDURE PROD_SALES_SUM_SP---------------*/
+CREATE OR REPLACE PROCEDURE PROD_SALES_SUM_SP(p_idproduct bb_prod_sales.idproduct%TYPE,p_month bb_prod_sales.month%TYPE,p_year bb_prod_sales.year%TYPE, p_qty bb_prod_sales.qty%TYPE,p_total bb_prod_sales.total%TYPE)
+AS
+BEGIN
+INSERT INTO bb_prod_sales(idproduct,month,year,qty,total)
+VALUES(p_idproduct,p_month,p_year,p_qty,p_total);
+END PROD_SALES_SUM_SP;
+
+/*------EXECUTION BLOCK FOR PROD_SALES_SUM_SP----*/
+DECLARE
+    CURSOR CUR_MEMBER IS
+    SELECT a.idproduct,TO_CHAR(b.dtcreated,'MON')mth,TO_CHAR(b.dtcreated,'YYYY')yr,SUM(a.quantity)totalqty,SUM(b.total)t FROM bb_basketitem a,bb_basket b 
+    WHERE a.idbasket=b.idbasket AND b.orderplaced=1 GROUP BY a.idproduct,TO_CHAR(b.dtcreated,'MON'),TO_CHAR(b.dtcreated,'YYYY') ORDER BY a.idproduct;
+BEGIN
+    FOR CUR_REC IN CUR_MEMBER LOOP
+    PROD_SALES_SUM_SP(CUR_REC.idproduct,CUR_REC.mth,CUR_REC.yr,CUR_REC.totalqty,CUR_REC.t);
+    END LOOP;
+END;
+
+/*----------------------------SHOP_SALES_SUM_SP Procedure----------------------*/
+CREATE OR REPLACE PROCEDURE SHOP_SALES_SUM_SP(p_idshopper bb_shop_sales.idshopper%TYPE,p_total bb_shop_sales.total%TYPE)
+AS
+BEGIN
+INSERT INTO bb_shop_sales(idshopper,total)
+VALUES(p_idshopper,p_total);
+END SHOP_SALES_SUM_SP;
+
+/*------Execution block for SHOP_SALES_SUM_SP---*/
+DECLARE
+    CURSOR CUR_MEMBER IS
+    SELECT idshopper,SUM(subtotal)t FROM bb_basket WHERE orderplaced=1 GROUP BY idshopper ORDER BY idshopper;
+BEGIN
+    FOR CUR_REC IN CUR_MEMBER LOOP
+    SHOP_SALES_SUM_SP(CUR_REC.idshopper,CUR_REC.t);
+    END LOOP;
+END;

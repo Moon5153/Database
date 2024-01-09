@@ -1,0 +1,118 @@
+/*1. Assignment 3-9: Retrieving Pledge Totals*/
+
+ACCEPT p_id NUMBER PROMPT 'Enter a valid project ID';
+DECLARE
+    pr_id dd_project.idproj%TYPE := &p_id;
+    pr_name dd_project.projname%TYPE;
+    pl_count dd_pledge.pledgeamt%TYPE;
+    pl_sum dd_pledge.pledgeamt%TYPE;
+    pl_average dd_pledge.pledgeamt%TYPE;
+BEGIN
+   SELECT a.idproj,a.projname,b.cnt,b.total,b.average INTO pr_id,pr_name,pl_count,pl_sum,pl_average
+   FROM dd_project a,(SELECT idproj,COUNT(pledgeamt)cnt,SUM(pledgeamt)total,AVG(pledgeamt)average FROM dd_pledge GROUP BY idproj)b
+   WHERE a.idproj=b.idproj
+   AND pr_id=a.idproj;
+   DBMS_OUTPUT.PUT_LINE('Project ID: '||pr_id||'  Project Name: '||pr_name||'  Number of Pledges: '||pl_count||'  Total dollars: $'||pl_sum||'  Average pledge amount : '||pl_average);
+END;
+
+/*2. Assignment 3-10: Adding a Project */
+
+CREATE SEQUENCE dd_projid_seq
+START WITH 530
+INCREMENT BY 1
+NOCACHE;
+
+DECLARE
+    TYPE pr_record IS RECORD(
+    pr_name dd_project.projname%TYPE:='HK Animal Shelter Extension',
+    pr_start_date dd_project.projstartdate%TYPE:='1/1/2013',
+    pr_end_date dd_project.projenddate%TYPE:='5/31/2013',
+    pr_fund dd_project.projfundgoal%TYPE:=65000
+    );
+    project_rec pr_record;
+    
+BEGIN
+    INSERT INTO dd_project (idproj,projname,projstartdate,projenddate,projfundgoal)
+    VALUES(dd_projid_seq.NEXTVAL,project_rec.pr_name,project_rec.pr_start_date,project_rec.pr_end_date,project_rec.pr_fund);
+END;
+
+
+/*3. Assignment 3-11: Retrieving and Displaying Pledge Data*/
+
+ACCEPT start_month_date DATE PROMPT 'Enter the start date of a month (MM-DD-YYYY)';
+ACCEPT end_month_date DATE PROMPT 'Enter the end date of a month (MM-DD-YYYY)';
+
+DECLARE
+    TYPE pl_table IS TABLE OF dd_pledge%ROWTYPE;
+    pl_new_table pl_table;
+    
+    pl_months dd_pledge.paymonths%TYPE;
+    pl_start_date DATE:= TO_DATE('&start_month_date','MM-DD-YYYY');
+    pl_end_date DATE:= TO_DATE('&end_month_date','MM-DD-YYYY');
+    
+    v_counter NUMBER:=0;
+    v_message VARCHAR2(15);
+
+BEGIN
+    SELECT * BULK COLLECT INTO pl_new_table FROM dd_pledge 
+    WHERE dd_pledge.pledgedate>=pl_start_date AND dd_pledge.pledgedate<=pl_end_date
+    ORDER BY dd_pledge.paymonths,dd_pledge.idpledge;
+    
+    LOOP 
+        v_counter:=v_counter+1;
+        IF pl_new_table(v_counter).paymonths=0 THEN
+            v_message:='Lump Sum';
+            pl_months:=NULL;
+            
+        ELSE
+            v_message:='Monthly - ';
+            pl_months:=pl_new_table(v_counter).paymonths;
+        END IF;
+        
+            DBMS_OUTPUT.PUT_LINE('Pledge ID: '||pl_new_table(v_counter).idpledge||'  Donor ID: '||pl_new_table(v_counter).iddonor||'   Pledge amount: $'||pl_new_table(v_counter).pledgeamt||'   '||v_message||pl_months);
+       
+        IF v_counter>=pl_new_table.COUNT THEN
+             EXIT;
+        END IF;
+    END LOOP;
+END;
+ 
+ 
+/*4.Assignment 3-12: Retrieving a Specific Pledge*/
+
+ACCEPT p_id NUMBER PROMPT 'Enter a valid pledge id';
+DECLARE
+    pl_id dd_pledge.idpledge%TYPE := &p_id;
+    pl_donor_id dd_pledge.iddonor%TYPE;
+    pl_amount dd_pledge.pledgeamt%TYPE;
+    py_sum dd_payment.payamt%TYPE;
+    py_difference dd_payment.payamt%TYPE;
+  
+BEGIN
+    SELECT a.idpledge,a.iddonor,a.pledgeamt,b.total,(a.pledgeamt-b.total)difference INTO pl_id,pl_donor_id,pl_amount,py_sum,py_difference
+    FROM dd_pledge a,(SELECT idpledge,SUM(payamt)total FROM dd_payment GROUP BY idpledge)b 
+    WHERE a.idpledge=b.idpledge
+    AND pl_id=a.idpledge;
+    DBMS_OUTPUT.PUT_LINE('Pledge ID: '||pl_id||'  Donor ID: '||pl_donor_id||'  Pledge Amount: '||pl_amount||'  Total amount paid: '||py_sum||'  Difference : '||py_difference);
+END;
+
+
+/*5. Assignment 3-13: Modifying Data*/
+
+DECLARE
+    pr_id dd_project.idproj%TYPE;
+    pr_name dd_project.projname%TYPE;
+    pr_start_date dd_project.projstartdate%TYPE;
+    pr_fund dd_project.projfundgoal%TYPE;
+    pr_new_fund dd_project.projfundgoal%TYPE:=70000;
+    
+BEGIN
+    SELECT idproj,projname,projstartdate,projfundgoal INTO pr_id,pr_name,pr_start_date,pr_fund FROM dd_project
+    WHERE idproj=504;
+    
+    UPDATE dd_project
+    SET dd_project.projfundgoal=pr_new_fund
+    WHERE idproj=502;
+    
+    DBMS_OUTPUT.PUT_LINE('Project Name: '||pr_name||'  Start date: '||pr_start_date||'  Previous Fundraising Goal:  '||pr_fund||'  New Fundraising goal:  '||pr_new_fund);
+END;

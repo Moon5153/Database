@@ -1,0 +1,61 @@
+/*----1.DISPLAY TABLES---*/
+SELECT * FROM customer;
+SELECT * FROM payment;
+SELECT * FROM orders;
+SELECT * FROM product;
+SELECT * FROM categories;
+SELECT * FROM supplier;
+SELECT * FROM cart;
+
+/*--2.TEST TRIGGERS--*/
+
+--TEST customer_audit_trigger
+
+INSERT INTO customer VALUES(10020,'Jennifer','Aniston','842 Mckenzie Dr','Calgary','T2E 1W3','jennyaniston10@gmail.com',4035614123);
+UPDATE customer SET lastName='Lopez' WHERE customerId=10001;
+DELETE FROM customer WHERE customerId=10020;
+
+SELECT * FROM customer_data_audit;
+
+--TEST product_audit_trigger
+UPDATE product SET price=600 WHERE productId=500021;
+DELETE FROM product WHERE productId=500022;
+
+SELECT * FROM product_data_audit;
+
+/*--TEST PROCEDURES--*/
+
+--TEST pr_product
+BEGIN
+    pr_product(300);
+END;
+/
+SELECT * FROM product;
+
+
+--TEST pr_cart
+BEGIN
+    pr_cart(300);
+END;
+/
+SELECT * FROM cart;
+
+
+/*--TEST FUNCTION---*/
+
+DECLARE
+    CURSOR cart_data IS
+    SELECT cartId,itemsPrice,total_after_discount FROM cart;
+    f_tax NUMBER(5,2);
+BEGIN
+    f_tax:=GST_tax(5);
+    FOR cart_rec IN cart_data LOOP
+    IF cart_rec.itemsPrice>100 THEN
+     UPDATE cart SET subtotal=((f_tax*itemsPrice)+itemsPrice+shipping_and_handling) WHERE cart_rec.cartId=cartId;
+    ELSE
+    UPDATE cart SET subtotal=itemsPrice+shipping_and_handling WHERE cart_rec.cartId=cartId;
+    END IF;
+    END LOOP;
+END;
+/
+SELECT * FROM cart;

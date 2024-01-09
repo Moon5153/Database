@@ -1,0 +1,1079 @@
+DROP TABLE customer;
+DROP TABLE payment;
+DROP TABLE orders;
+DROP TABLE product;
+DROP TABLE categories;
+DROP TABLE supplier;
+DROP TABLE cart;
+DROP TABLE product_data_audit;
+DROP TABLE customer_data_audit;
+DROP SEQUENCE customer_id_seq;
+DROP SEQUENCE order_id_seq;
+DROP SEQUENCE customer_audit_seq;
+DROP SEQUENCE product_audit_seq;
+
+
+CREATE TABLE customer
+(
+    customerId INTEGER NOT NULL PRIMARY KEY,
+    firstName VARCHAR(30) NOT NULL,
+    lastName VARCHAR(30) NOT NULL,
+    address VARCHAR(50),
+    city VARCHAR(30),
+    postalCode VARCHAR(30),
+    email VARCHAR(50),
+    phoneNo NUMBER
+);
+
+CREATE TABLE orders
+(
+    orderId INTEGER NOT NULL PRIMARY KEY,
+    orderNo INTEGER,
+    customerId INTEGER,
+    productID INTEGER,
+    quantity INTEGER,
+    orderDate DATE,
+    shipDate DATE
+);
+
+CREATE TABLE payment
+(
+    paymentId INTEGER NOT NULL PRIMARY KEY,
+    orderId INTEGER,
+    paymentType VARCHAR(30) NOT NULL,
+    total NUMERIC(8,2)
+);
+
+CREATE TABLE product
+(
+    productId INTEGER NOT NULL PRIMARY KEY,
+    supplierId INTEGER,
+    productName VARCHAR(50) NOT NULL,
+    productTitle VARCHAR(50),
+    productDescription VARCHAR(150) NOT NULL,
+    categoryId INTEGER,
+    price NUMERIC(8,2) NOT NULL,
+    discount VARCHAR(30)
+);
+    
+CREATE TABLE categories
+(
+    categoryId INTEGER NOT NULL PRIMARY KEY,
+    categoryName VARCHAR(50)
+);
+
+CREATE TABLE supplier
+(
+    supplierId INTEGER NOT NULL PRIMARY KEY,
+    firstName VARCHAR(30) NOT NULL,
+    lastName VARCHAR(30) NOT NULL,
+    email VARCHAR(50),
+    phoneNo NUMBER,
+    companyName VARCHAR(50) NOT NULL
+);  
+CREATE TABLE cart
+(
+    cartId INTEGER NOT NULL PRIMARY KEY,
+    paymentId INTEGER,
+    dateCreated DATE,
+    shippingAddress VARCHAR(200),
+    itemsPrice NUMERIC(8,2),
+    shipping_and_handling NUMERIC(8,2),
+    subTotal NUMERIC(8,2),
+    total_after_discount NUMERIC(8,2)
+);
+
+/*--CREATE SEQUENCE--*/
+
+CREATE SEQUENCE customer_id_seq
+START WITH 10000
+INCREMENT BY 1
+NOCYCLE;
+
+CREATE SEQUENCE order_id_seq
+START WITH 20000
+INCREMENT BY 1
+NOCYCLE;
+
+/*--INSERT INTO CUSTOMER--*/
+
+INSERT INTO customer
+VALUES
+(
+    customer_id_seq.NEXTVAL,
+    'Jacob',
+    'Ellordi',
+    '20 Teesdale Place',
+    'Toronto',
+    'M1L 1K5',
+    'jacobellordi@gmail.com',
+    6471543232
+);
+
+INSERT INTO customer
+VALUES
+(
+    customer_id_seq.NEXTVAL,
+    'Emma',
+    'Roberts',
+    '389 Scarborough Rd',
+    'Toronto',
+    'M4E 3N1',
+    'emma143@gmail.com',
+    4169754391
+);
+INSERT INTO customer
+VALUES
+(
+    customer_id_seq.NEXTVAL,
+    'Martin',
+    'Smith',
+    '847 McKenzie Dr',
+    'Calgary',
+    'T2Z 1W3',
+    'smithmartin24@gmail.com',
+     4032575992
+);
+INSERT INTO customer
+VALUES
+(
+    customer_id_seq.NEXTVAL,
+    'Stephen',
+    'Johnson',
+    '245 Main Ave',
+    'Halifax',
+    'B3M 1B7',
+    'johnsonsmith@gmail.com',
+      9024466228
+);
+INSERT INTO customer
+VALUES
+(
+    customer_id_seq.NEXTVAL,
+    'Kate',
+    'Smith',
+    '2909 George Dauphine Ave',
+    'Halifax',
+    'B3P 2M4',
+    'katesmithOfficial@gmail.com',
+      9024775871
+);
+INSERT INTO customer
+VALUES
+(
+    customer_id_seq.NEXTVAL,
+    'Norman',
+    'Williams',
+    '36 Chestergrove Cres',
+    'Toronto',
+    'M1W 1L4',
+    'williams430@gmail.com',
+     4164990928
+);
+INSERT INTO customer
+VALUES
+(
+    customer_id_seq.NEXTVAL,
+    'Dennis',
+    'Williams',
+    '820 Scollard Crt',
+    'Mississauga',
+    'L5V 0A1',
+    'dennissofficial@gmail.com',
+     9056249494
+);
+INSERT INTO customer
+VALUES
+(
+    customer_id_seq.NEXTVAL,
+    'Kristen',
+    'Robertson',
+    '20 Rouge St',
+    'Markham',
+    'L3P 1K8',
+    'kristernroberts@gmail.com',
+     9054725646
+);
+INSERT INTO customer
+VALUES
+(
+    customer_id_seq.NEXTVAL,
+    'Lerona',
+    'Michaelson',
+    '279 Conley St ',
+    'Thornhill',
+    'L4J 2Z2',
+    'leronamichael451@gmail.com',
+     4166989608
+);
+INSERT INTO customer
+VALUES
+(
+    customer_id_seq.NEXTVAL,
+    'Helene',
+    'Stanley',
+    '5957 Jeanne Mance Street',
+    'Montreal',
+    'H2V 4K9',
+    'helene462@gmail.com',
+     4383847045
+);
+
+/*--INSERT INTO ORDERS--*/
+INSERT INTO orders
+VALUES
+(
+    order_id_seq.NEXTVAL,
+    18001,
+    10001,
+    500021,
+    1,
+    date '2019-04-12',
+    date '2019-04-15'
+);
+INSERT INTO orders
+VALUES
+(
+    order_id_seq.NEXTVAL,
+    19010,
+    10001,
+    500023,
+    3,
+    date '2019-07-22',
+    date '2019-07-28'
+);
+INSERT INTO orders
+VALUES
+(
+    order_id_seq.NEXTVAL,
+    28091,
+    10007,
+    500029,
+    1,
+    date '2020-01-10',
+    date '2020-01-11'
+);
+INSERT INTO orders
+VALUES
+(
+    order_id_seq.NEXTVAL,
+    386712,
+    10004,
+    500029,
+    5,
+    date '2020-08-12',
+    date '2020-08-25'
+);
+INSERT INTO orders
+VALUES
+(
+    order_id_seq.NEXTVAL,
+    386713,
+    10000,
+    500027,
+    1,
+    date '2020-03-12',
+    date '2020-03-15'
+);
+INSERT INTO orders
+VALUES
+(
+    order_id_seq.NEXTVAL,
+    391201,
+    10005,
+    500022,
+    1,
+    date '2018-12-12',
+    date '2018-12-27'
+);
+INSERT INTO orders
+VALUES
+(
+    order_id_seq.NEXTVAL,
+    423000,
+    10006,
+    500025,
+    7,
+    date '2018-04-21',
+    date '2018-04-26'
+);
+INSERT INTO orders
+VALUES
+(
+    order_id_seq.NEXTVAL,
+    18009,
+    10003,
+    500024,
+    1,
+    date '2018-06-18',
+    date '2018-06-19'
+);
+INSERT INTO orders
+VALUES
+(
+    order_id_seq.NEXTVAL,
+    19001,
+    10002,
+    500028,
+    3,
+    date '2019-02-06',
+    date '2019-02-15'
+);
+INSERT INTO orders
+VALUES
+(
+    order_id_seq.NEXTVAL,
+    18601,
+    10000,
+    500025,
+    2,
+    date '2021-09-17',
+    date '2021-09-18'
+);
+
+/*--INSERT INTO SUPPLIER--*/
+INSERT INTO supplier
+VALUES
+(
+    30001,
+    'John',
+    'Smith',
+    'smithjohn@gmail.com',
+     6475211432,
+    'Electronics Pixel'
+
+);
+
+INSERT INTO supplier
+VALUES
+(
+     30002,
+    'Michael',
+    'Stevenson',
+    'stevemichael56@gmail.com',
+     4167521468,
+    'Easy Buy'
+
+);
+
+INSERT INTO supplier
+VALUES
+(
+     30003,
+    'Roger',
+    'Cushnie',
+    'cushniestudio@gmail.com',
+     9054236215,
+    'Shop with Roger'
+
+);
+
+INSERT INTO supplier
+VALUES
+(
+    30004,
+    'Aria',
+    'Jackson',
+    'ariajackson@gmail.com',
+     4167093214,
+    'Fashion World'
+
+);
+INSERT INTO supplier
+VALUES
+(
+    30005,
+    'Ryan',
+    'Mcbroom',
+    'ryanofficial@gmail.com',
+     6475819834,
+    'Click N Play'
+
+);
+INSERT INTO supplier
+VALUES
+(
+     30006,
+    'Austin',
+    'Lively',
+    'austinlively234@gmail.com',
+     4165243532,
+    'Easy Shop'
+
+);
+INSERT INTO supplier
+VALUES
+(
+     30007,
+    'David',
+    'Muir',
+    'davidshop09@gmail.com',
+     9056742631,
+    'XPel Tetra Shop'
+
+);
+INSERT INTO supplier
+VALUES
+(
+    30008,
+    'Mitchell',
+    'Williams',
+    'mitchellwilliams96@gmail.com',
+     6473261342,
+    'Accessory world'
+
+);
+INSERT INTO supplier
+VALUES
+(
+     30009,
+    'Peter',
+    'Roberts',
+    'robertspeter64@gmail.com',
+     9053217952,
+    'Electro Techs'
+
+);
+INSERT INTO supplier
+VALUES
+(
+     30010,
+    'Drake',
+    'Pattinson',
+    'drake.pattinson109@gmail.com',
+     9053892642,
+    'Roger Furnitures'
+
+);
+
+/*--INSERT INTO CATEGORIES--*/
+
+INSERT INTO categories
+VALUES
+(
+    1,
+    'Electronics'
+);
+
+INSERT INTO categories
+VALUES
+(
+    2,
+    'Accessories'
+);
+INSERT INTO categories
+VALUES
+(
+    3,
+    'Fashion'
+);
+INSERT INTO categories
+VALUES
+(
+    4,
+    'Furniture'
+);
+INSERT INTO categories
+VALUES
+(
+    5,
+    'Pet Supplies'
+);
+INSERT INTO categories
+VALUES
+(
+    6,
+    'Sports and Outdoors'
+);
+INSERT INTO categories
+VALUES
+(
+    7,
+    'Tools and Supplies'
+);
+INSERT INTO categories
+VALUES
+(
+    8,
+    'Musical Instruments'
+);
+INSERT INTO categories
+VALUES
+(
+    9,
+    'Health and Personal Care'
+);
+INSERT INTO categories
+VALUES
+(
+    10,
+    'Books'
+);
+
+/*INSERT INTO PRODUCT*/
+
+INSERT INTO product
+VALUES
+(
+    500021,
+    30008,
+    'Hand Bag',
+    'Gucci handbag',
+     'Color: Black, Size: travel size, waterproof',
+    2,
+    500,
+    'N/A'
+);
+
+INSERT INTO product
+VALUES
+(
+    500022,
+    30001,
+    'TV',
+    'Samsung TV',
+     '43" Ultra HD Smart TV',
+    1,
+    598,
+    'N/A'
+);
+INSERT INTO product
+VALUES
+(
+    500023,
+    30009,
+    'Digital Clock',
+    'SONIC',
+     'Dual Alarm, rechargeable clock',
+    1,
+    35,
+    'N/A'
+);
+INSERT INTO product
+VALUES
+(
+    500024,
+    30004,
+    'T-Shirt',
+    'Adidas Mens Tee',
+     '100% cotton, machine washable casual tee',
+    3,
+    150,
+    'N/A'
+);
+INSERT INTO product
+VALUES
+(
+    500025,
+    30010,
+    'Office Desk',
+    'SogesHome 47inch Computer Desk',
+     'Computer Desk for home office with shelves',
+    4,
+    159,
+    'N/A'
+);
+INSERT INTO product
+VALUES
+(
+    500026,
+    30002,
+    'Badminton Set',
+    'Senseton Badminton Set',
+     '2 player racket set-including 1 bag, 2 rackets,2Grip',
+    6,
+    52,
+    'N/A'
+);
+INSERT INTO product
+VALUES
+(
+    500027,
+    30005,
+    'Acoustic Guitar',
+    'Yamaha F325D Acoustic Guitar',
+     'Top material Spruce and back material Sapele Wood. 2.92 Kg',
+    8,
+    199.99,
+    'N/A'
+);
+INSERT INTO product
+VALUES
+(
+    500028,
+    30006,
+    'Running Shoes',
+    'Nike',
+     'Foam sole. Padded collar and tongue for increased comfort.',
+    3,
+    384.89,
+    'N/A'
+);
+INSERT INTO product
+VALUES
+(
+    500029,
+    30008,
+    'Pendant',
+    'Embrace pendant',
+     'Gold plated crystal pendant necklace.',
+    2,
+    140,
+    'N/A'
+);
+INSERT INTO product
+VALUES
+(
+    500030,
+    30001,
+    'Electric Massager',
+    'Renpho back Massager',
+     'Handheld electric portable massager. Performs deep tissue massage',
+    2,
+    169.99,
+    'N/A'
+);
+
+/* INSERT INTO PAYMENT*/
+
+INSERT INTO payment
+VALUES
+(
+    60000,
+    20000,
+    'credit',
+    500.00
+);
+INSERT INTO payment
+VALUES
+(
+    60001,
+    20008,
+    'credit',
+    1154.67
+);
+INSERT INTO payment
+VALUES
+(
+    60002,
+    20002,
+    'debit',
+    140.00
+);
+INSERT INTO payment
+VALUES
+(
+    60003,
+    20004,
+    'credit',
+    199.99
+);
+INSERT INTO payment
+VALUES
+(
+    60004,
+    20001,
+    'debit',
+    105.00
+);
+INSERT INTO payment
+VALUES
+(
+    60005,
+    20003,
+    'credit',
+    700.00
+);
+INSERT INTO payment
+VALUES
+(
+    60006,
+    20005,
+    'credit',
+    500.00
+);
+INSERT INTO payment
+VALUES
+(
+    60007,
+    20009,
+    'credit',
+    318.00
+);
+INSERT INTO payment
+VALUES
+(
+    60008,
+    20007,
+    'debit',
+    150.00
+);
+INSERT INTO payment
+VALUES
+(
+    60009,
+    20006,
+    'credit',
+    1113.00
+);
+
+/* INSERT INTO CART*/
+
+INSERT INTO cart
+VALUES
+(
+    501,
+    60002,
+    date '2020-01-10',
+    '20 Rouge St, Markham, L3P 1K8',
+    140.00,
+    10.99,
+    150.99,
+    NULL
+);
+INSERT INTO cart
+VALUES
+(
+    502,
+    60000,
+    date '2019-04-12',
+    '389 Scarborough Rd,Toronto, M4E 3N1',
+    500.00,
+    30.99,
+    530.99,
+    NULL
+);
+INSERT INTO cart
+VALUES
+(
+    503,
+    60005,
+    date '2020-08-12',
+    '2909 George Dauphine Ave, Halifax, B3P 2M4',
+    700.00,
+    10.99,
+    710.99,
+    NULL
+);
+INSERT INTO cart
+VALUES
+(
+    504,
+    60003,
+    date '2020-03-12',
+    '20 Teesdale Place,Toronto, M1L 1K5',
+    199.99,
+    10.99,
+    210.98,
+    NULL
+);
+INSERT INTO cart
+VALUES
+(
+    505,
+    60006,
+    date '2018-12-12',
+    '36 Chestergrove Ges, Toronto, M1W 1L4',
+    500.00,
+    50.99,
+    550.99,
+    NULL
+);
+INSERT INTO cart
+VALUES
+(
+    506,
+    60009,
+    date '2018-04-21',
+    '820 Scollard Gt, Missisuaga, L5V 0A1',
+    1113.00,
+    100.99,
+    1213.99,
+    NULL
+);
+INSERT INTO cart
+VALUES
+(
+    507,
+    60001,
+    date '2019-02-06',
+    '847 McKenzie Dr, Calgary, T2Z 1W3',
+    1154.67,
+    20.99,
+    1175.66,
+    NULL
+);
+INSERT INTO cart
+VALUES
+(
+    508,
+    60008,
+    date '2019-06-18',
+    '245 Main Ave, Halifax, B3M 1B7',
+    150.00,
+    10.99,
+    160.99,
+    NULL
+);
+INSERT INTO cart
+VALUES
+(
+    509,
+    60004,
+    date '2019-07-22',
+    '389 Scarborough Rd, Toronto, M4E 3N1',
+    105.00,
+    5.99,
+    110.99,
+    NULL
+);
+INSERT INTO cart
+VALUES
+(
+    510,
+    60007,
+    date '2021-09-17',
+    '36 Chestergrove Ges, Toronto, M1W 1L4',
+    318.00,
+    20.99,
+    338.99,
+    NULL
+);
+
+/*--CREATE INDEX--*/
+
+CREATE INDEX customer_name_idx 
+ON customer(firstName);
+
+CREATE INDEX product_name_idx
+ON product(productName);
+
+CREATE INDEX supplier_companyName_idx
+ON supplier(companyName);
+
+
+/*---CREATE AUDIT TABLES----*/
+CREATE TABLE product_data_audit
+(
+    id NUMBER,
+    old_prodName VARCHAR(50),
+    new_prodName VARCHAR(50),
+    old_price NUMERIC(10,2),
+    new_price NUMERIC(10,2),
+    user_name VARCHAR(50),
+    modification_date VARCHAR(50),
+    operation VARCHAR(50)
+);
+
+CREATE TABLE customer_data_audit
+(
+    id NUMBER,
+    old_firstName VARCHAR(50),
+    old_lastName VARCHAR(50),
+    old_address VARCHAR(150),
+    old_city VARCHAR(50),
+    old_postalCode VARCHAR(50),
+    old_email VARCHAR(150),
+    old_phone NUMBER,
+    new_firstName VARCHAR(50),
+    new_lastName VARCHAR(50),
+    new_address VARCHAR(150),
+    new_city VARCHAR(50),
+    new_postalCode VARCHAR(50),
+    new_email VARCHAR(150),
+    new_phone NUMBER,
+    user_name VARCHAR(50),
+    modification_date VARCHAR(50),
+    operation VARCHAR(50)
+);
+
+CREATE SEQUENCE customer_audit_seq
+START WITH 1
+INCREMENT BY 1
+NOCYCLE;
+
+CREATE SEQUENCE product_audit_seq
+START WITH 1
+INCREMENT BY 1
+NOCYCLE;
+
+/*----TRIGGERS-----*/
+CREATE OR REPLACE TRIGGER customer_audit_trigger
+BEFORE INSERT OR UPDATE OR DELETE ON customer
+FOR EACH ROW
+DECLARE
+    v_user VARCHAR(50);
+    v_date VARCHAR(50);
+BEGIN
+    SELECT user,TO_CHAR(SYSDATE,'DD-MON-YY') INTO v_user,v_date FROM dual;
+IF INSERTING THEN
+    INSERT INTO customer_data_audit
+    VALUES
+    (
+        customer_audit_seq.NEXTVAL,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        :NEW.firstName,
+        :NEW.lastName,
+        :NEW.address,
+        :NEW.city,
+        :NEW.postalCode,
+        :NEW.email,
+        :NEW.phoneNo,
+        v_user,
+        v_date,
+        'INSERT'
+    );
+ELSIF DELETING THEN
+    INSERT INTO customer_data_audit
+    VALUES
+    (
+        customer_audit_seq.NEXTVAL,
+        :OLD.firstName,
+        :OLD.lastName,
+        :OLD.address,
+        :OLD.city,
+        :OLD.postalCode,
+        :OLD.email,
+        :OLD.phoneNo,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        v_user,
+        v_date,
+        'DELETE'
+    );
+ELSIF UPDATING THEN
+    INSERT INTO customer_data_audit
+    VALUES
+    (
+        customer_audit_seq.NEXTVAL,
+        :OLD.firstName,
+        :OLD.lastName,
+        :OLD.address,
+        :OLD.city,
+        :OLD.postalCode,
+        :OLD.email,
+        :OLD.phoneNo,
+        :NEW.firstName,
+        :NEW.lastName,
+        :NEW.address,
+        :NEW.city,
+        :NEW.postalCode,
+        :NEW.email,
+        :NEW.phoneNo,
+        v_user,
+        v_date,
+        'UPDATE'
+    );
+END IF;
+END;
+/
+
+CREATE OR REPLACE TRIGGER product_audit_trigger
+BEFORE INSERT OR UPDATE OR DELETE ON product
+FOR EACH ROW
+DECLARE
+    v_user VARCHAR(50);
+    v_date VARCHAR(50);
+BEGIN
+    SELECT user,TO_CHAR(SYSDATE,'DD-MON-YY') INTO v_user,v_date FROM dual;
+IF INSERTING THEN
+    INSERT INTO product_data_audit
+    VALUES
+    (
+         product_audit_seq.NEXTVAL,
+         NULL,
+        :NEW.productName,
+         NULL,
+        :NEW.price,
+        v_user,
+        v_date,
+        'INSERT'
+    );
+ELSIF DELETING THEN
+    INSERT INTO product_data_audit
+    VALUES
+    (
+         product_audit_seq.NEXTVAL,
+        :OLD.productName,
+         NULL,
+        :OLD.price,
+         NULL,
+         v_user,
+         v_date,
+        'DELETE'
+    );
+ELSIF UPDATING THEN
+    INSERT INTO product_data_audit
+    VALUES
+    (
+        product_audit_seq.NEXTVAL,
+        :OLD.productName,
+        :NEW.productName,
+        :OLD.price,
+        :NEW.price,
+        v_user,
+        v_date,
+        'UPDATE'
+    );
+END IF;
+END;
+/
+
+/*-----PROCEDURES-----*/
+
+CREATE OR REPLACE PROCEDURE pr_product(pr_price product.price%TYPE)
+IS
+ CURSOR product_data IS
+    SELECT productId,productName,productTitle,price,discount FROM product;
+ BEGIN
+    FOR product_rec IN product_data LOOP
+        IF product_rec.price >=pr_price THEN
+            UPDATE product SET discount ='Eligible for discount'
+            WHERE productId=product_rec.productId;
+        ELSE
+            UPDATE product SET discount = 'Not Eligible for discount'
+            WHERE productId=product_rec.productId;
+        END IF;
+    END LOOP;
+END;
+/
+
+CREATE OR REPLACE PROCEDURE pr_cart(pr_price cart.itemsPrice%TYPE)
+IS
+ CURSOR cart_data IS
+    SELECT cartId,itemsPrice,shipping_and_handling,subtotal,total_after_discount FROM cart;
+    pr_total NUMERIC(8,2);
+ BEGIN
+    FOR cart_rec IN cart_data LOOP
+        IF cart_rec.itemsPrice >=pr_price THEN
+            pr_total:=cart_rec.subtotal-(cart_rec.itemsPrice*0.15);
+            UPDATE cart SET total_after_discount =pr_total
+            WHERE cartId=cart_rec.cartId;
+        ELSE
+            pr_total:=cart_rec.subtotal;
+            UPDATE cart SET total_after_discount =pr_total
+            WHERE cartId=cart_rec.cartId;
+        END IF;
+    END LOOP;
+END;
+/
+
+/*-------FUNCTION-------*/
+CREATE OR REPLACE FUNCTION GST_tax(f_percentage NUMBER)
+RETURN NUMBER IS
+tax NUMBER(5,2);
+BEGIN
+    tax:=f_percentage/100;
+    RETURN tax;
+END;
